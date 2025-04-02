@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Payment Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --warning: #ffc107;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+        
+        .admin-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--dark);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-nav {
+            margin-top: 1.5rem;
+        }
+        
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            overflow-x: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+            min-width: 250px;
+        }
+        
+        .search-box button {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card p {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .stat-card.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .stat-card.pending {
+            border-left: 4px solid var(--warning);
+        }
+        
+        .stat-card.rejected {
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Payment Table */
+        .payment-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-width: 800px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+        }
+        
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+        
+        tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+        
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        tbody tr:hover {
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+        
+        .status-completed {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-rejected {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .approve-btn {
+            background: var(--success);
+            color: white;
+            margin-right: 0.5rem;
+        }
+        
+        .reject-btn {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .screenshot-preview {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .screenshot-preview:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            position: relative;
+        }
+        
+        .verification-info {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 80%;
+            max-height: 80vh;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .modal-img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        .notification.warning {
+            background: var(--warning);
+        }
+        
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .connection-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .connection-indicator.online {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-indicator.offline {
+            background: #dc3545;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            th, td {
+                padding: 0.8rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .search-box input {
+                flex-grow: 1;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-shield-alt"></i> Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-money-check-alt"></i> Payments
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i> Users
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-download"></i> Downloads
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+                <div class="nav-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Payment Verification</h1>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search transactions...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card success">
+                    <h3>Verified Payments</h3>
+                    <p id="verified-count">0</p>
+                </div>
+                <div class="stat-card pending">
+                    <h3>Pending Verification</h3>
+                    <p id="pending-count">0</p>
+                </div>
+                <div class="stat-card rejected">
+                    <h3>Rejected Payments</h3>
+                    <p id="rejected-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Revenue</h3>
+                    <p id="total-revenue">₹0</p>
+                </div>
+            </div>
+            
+            <!-- Payment Table -->
+            <div class="payment-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Amount</th>
+                            <th>User</th>
+                            <th>Screenshot</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTable">
+                        <!-- Payments will be loaded here -->
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">
+                                <div class="spinner"></div>
+                                <p>Loading payments...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Screenshot Preview -->
+    <div class="modal" id="screenshotModal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <img src="" alt="Payment Screenshot" class="modal-img" id="modalImage">
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="connection-status">
+        <span id="connectionIndicator" class="connection-indicator offline"></span>
+        <span id="connectionText">Connecting...</span>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const paymentsTable = document.getElementById('paymentsTable');
+        const verifiedCount = document.getElementById('verified-count');
+        const pendingCount = document.getElementById('pending-count');
+        const rejectedCount = document.getElementById('rejected-count');
+        const totalRevenue = document.getElementById('total-revenue');
+        const modal = document.getElementById('screenshotModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeModal = document.querySelector('.close-modal');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const notification = document.getElementById('notification');
+        const connectionIndicator = document.getElementById('connectionIndicator');
+        const connectionText = document.getElementById('connectionText');
+        
+       // In admin-dashboard.html
+        const API_BASE_URL = 'http://localhost:3000'; // Change to your backend port
+        const SOCKET_URL = 'http://localhost:3000';
+        
+        // Current admin data
+        let currentAdmin = null;
+        let allPayments = [];
+        let socket = null;
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            await checkAdminAuth();
+            
+            // Initialize Socket.IO connection
+            await initializeSocket();
+            
+            // Load initial payments
+            await loadPayments();
+            
+            // Set up auto-refresh
+            setInterval(loadPayments, 30000);
+            
+            // Set up search
+            searchBtn.addEventListener('click', searchPayments);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchPayments();
+            });
+            
+            // Modal close handlers
+            closeModal.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize Socket.IO connection
+        async function initializeSocket() {
+            try {
+                socket = io(SOCKET_URL, {
+                    reconnection: true,
+                    reconnectionAttempts: Infinity,
+                    reconnectionDelay: 1000,
+                    reconnectionDelayMax: 5000,
+                    timeout: 20000,
+                    transports: ['websocket']
+                });
+
+                socket.on('connect', () => {
+                    updateConnectionStatus(true);
+                    console.log('Connected to WebSocket server');
+                    showNotification('Live updates connected', 'success');
+                });
+
+                socket.on('disconnect', (reason) => {
+                    updateConnectionStatus(false);
+                    console.log('Disconnected:', reason);
+                    if (reason === 'io server disconnect') {
+                        // Server intentionally disconnected, try to reconnect
+                        socket.connect();
+                    }
+                });
+
+                socket.on('connect_error', (error) => {
+                    console.error('Socket connection error:', error);
+                    updateConnectionStatus(false);
+                    showNotification('Connection lost. Reconnecting...', 'warning');
+                });
+
+                socket.on('reconnect', (attempt) => {
+                    updateConnectionStatus(true);
+                    console.log('Reconnected after', attempt, 'attempts');
+                    showNotification('Reconnected to live updates', 'success');
+                });
+
+                socket.on('new-payment', (payment) => {
+                    handleNewPayment(payment);
+                });
+
+                socket.on('payment-updated', (payment) => {
+                    handlePaymentUpdate(payment);
+                });
+
+            } catch (error) {
+                console.error('Socket initialization error:', error);
+                updateConnectionStatus(false);
+                showNotification('Failed to connect to live updates', 'error');
+            }
+        }
+
+        // Update connection status UI
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                connectionIndicator.className = 'connection-indicator online';
+                connectionText.textContent = 'Live updates connected';
+            } else {
+                connectionIndicator.className = 'connection-indicator offline';
+                connectionText.textContent = 'Connection lost - retrying...';
+            }
+        }
+
+        // Check admin authentication
+        function checkAdminAuth() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = 'admin-dashboard.html';
+                return;
+            }
+            
+            try {
+                // Decode token to get admin info
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                currentAdmin = {
+                    id: payload.id,
+                    email: payload.email,
+                    name: payload.name
+                };
+                
+                // Update UI with admin info
+                document.querySelector('.sidebar-header h2').innerHTML = 
+                    `<i class="fas fa-shield-alt"></i> ${currentAdmin.name || 'Admin Panel'}`;
+                    
+            } catch (error) {
+                console.error('Token decode error:', error);
+                localStorage.removeItem('adminToken');
+                window.location.href = 'admin-dashboard.html';
+            }
+        }
+
+        // Load payments data with retry logic
+        async function loadPayments(retryCount = 0) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/admin/payments`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        // Unauthorized - token expired or invalid
+                        localStorage.removeItem('adminToken');
+                        window.location.href = 'admin-dashboard.html';
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const { data, pagination } = await response.json();
+                allPayments = data;
+                renderPayments(data);
+                updateStats(data);
+                
+            } catch (error) {
+                console.error('Payment load error:', error);
+                
+                if (retryCount < 3) {
+                    showNotification(`Retrying payment load (${retryCount + 1}/3)...`, 'warning');
+                    await new Promise(resolve => setTimeout(resolve, 2000 * (retryCount + 1)));
+                    return loadPayments(retryCount + 1);
+                }
+                
+                showNotification('Failed to load payments. Please check your connection.', 'error');
+                paymentsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--danger);">
+                            Failed to load payments. Please refresh the page.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Handle new payment from socket
+        function handleNewPayment(payment) {
+            // Check if payment already exists
+            const exists = allPayments.some(p => p.id === payment.id);
+            if (!exists) {
+                allPayments.unshift(payment);
+                renderPayments(allPayments);
+                updateStats(allPayments);
+                showNotification(`New ₹${payment.amount} payment from ${payment.user_email || 'user'}`, 'success');
+            }
+        }
+
+        // Handle payment updates from socket
+        function handlePaymentUpdate(updatedPayment) {
+            const index = allPayments.findIndex(p => p.id === updatedPayment.id);
+            if (index !== -1) {
+                allPayments[index] = updatedPayment;
+                renderPayments(allPayments);
+                updateStats(allPayments);
+                
+                // Show notification if this admin made the change
+                if (updatedPayment.verified_by === currentAdmin.id) {
+                    const action = updatedPayment.status === 'completed' ? 'approved' : 
+                                  updatedPayment.status === 'rejected' ? 'rejected' : 'reset';
+                    showNotification(`Payment ${action} successfully!`, 'success');
+                }
+            }
+        }
+
+        // Render payments table
+        function renderPayments(payments) {
+            if (payments.length === 0) {
+                paymentsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem;">
+                            No payments found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            paymentsTable.innerHTML = '';
+
+            payments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.dataset.id = payment.id;
+                
+                // Format verification info if exists
+                let verificationInfo = '';
+                if (payment.verified_at) {
+                    const verifiedDate = new Date(payment.verified_at);
+                    verificationInfo = `
+                        <div class="verification-info">
+                            Verified by: ${payment.verified_by_email || 'Admin'}<br>
+                            On: ${verifiedDate.toLocaleDateString()} at ${verifiedDate.toLocaleTimeString()}
+                        </div>
+                    `;
+                }
+                
+                // Format admin notes if exists
+                let notesInfo = '';
+                if (payment.admin_notes) {
+                    notesInfo = `
+                        <div class="verification-info">
+                            Notes: ${payment.admin_notes}
+                        </div>
+                    `;
+                }
+                
+                // Format user info
+                let userInfo = payment.user_email || 'Guest';
+                if (payment.user_name) {
+                    userInfo = `${payment.user_name} (${payment.user_email})`;
+                }
+                
+                // Format screenshot preview
+                let screenshotPreview = 'N/A';
+                if (payment.screenshot) {
+                    screenshotPreview = `
+                        <img src="${API_BASE_URL}/uploads/${payment.screenshot}" 
+                             alt="Payment Proof" 
+                             class="screenshot-preview"
+                             onerror="this.style.display='none';this.parentNode.innerHTML='N/A'">
+                    `;
+                }
+                
+                row.innerHTML = `
+                    <td>${payment.transaction_id}</td>
+                    <td>₹${payment.amount}</td>
+                    <td>${userInfo}</td>
+                    <td>${screenshotPreview}</td>
+                    <td>
+                        <span class="status-badge status-${payment.status}">
+                            ${payment.status.toUpperCase()}
+                        </span>
+                        ${notesInfo}
+                        ${verificationInfo}
+                    </td>
+                    <td>${new Date(payment.created_at).toLocaleString()}</td>
+                    <td>
+                        ${payment.status === 'pending' ? `
+                            <button class="action-btn approve-btn" 
+                                    onclick="verifyPayment('${payment.transaction_id}', 'completed')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="action-btn reject-btn" 
+                                    onclick="verifyPayment('${payment.transaction_id}', 'rejected')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        ` : `
+                            <button class="action-btn reset-btn" 
+                                    onclick="verifyPayment('${payment.transaction_id}', 'pending')">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        `}
+                    </td>
+                `;
+                
+                paymentsTable.appendChild(row);
+            });
+
+            // Add screenshot preview functionality
+            document.querySelectorAll('.screenshot-preview').forEach(img => {
+                img.addEventListener('click', () => {
+                    modalImg.src = img.src;
+                    modal.style.display = 'flex';
+                });
+            });
+        }
+
+        // Update statistics cards
+        function updateStats(payments) {
+            const stats = {
+                verified: 0,
+                pending: 0,
+                rejected: 0,
+                revenue: 0
+            };
+
+            payments.forEach(payment => {
+                if (payment.status === 'completed') {
+                    stats.verified++;
+                    stats.revenue += parseFloat(payment.amount);
+                } else if (payment.status === 'pending') {
+                    stats.pending++;
+                } else if (payment.status === 'rejected') {
+                    stats.rejected++;
+                }
+            });
+
+            verifiedCount.textContent = stats.verified;
+            pendingCount.textContent = stats.pending;
+            rejectedCount.textContent = stats.rejected;
+            totalRevenue.textContent = `₹${stats.revenue.toFixed(2)}`;
+        }
+
+        // Verify payment (approve/reject/reset)
+        async function verifyPayment(transactionId, status) {
+            const buttons = document.querySelectorAll(`button[onclick*="verifyPayment('${transactionId}'"]`);
+            
+            try {
+                // Disable buttons and show loading state
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.innerHTML = `<div class="spinner"></div> ${btn.textContent.trim()}`;
+                });
+                
+                // Get notes from admin (simplified - in real app you might use a modal)
+                const notes = prompt(`Enter notes for ${status} action:`);
+                if (notes === null) {
+                    // User cancelled
+                    resetButtons(buttons);
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/admin/verify-payment/${transactionId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    },
+                    body: JSON.stringify({ 
+                        status,
+                        notes: notes || `Payment ${status} by admin`
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || `Verification failed with status ${response.status}`);
+                }
+
+                // Update local data
+                const index = allPayments.findIndex(p => p.transaction_id === transactionId);
+                if (index !== -1) {
+                    allPayments[index] = data.payment;
+                    renderPayments(allPayments);
+                    updateStats(allPayments);
+                }
+                
+                // Show success notification
+                const action = status === 'completed' ? 'approved' : 
+                              status === 'rejected' ? 'rejected' : 'reset';
+                showNotification(`Payment ${action} successfully!`, 'success');
+                
+            } catch (error) {
+                console.error('Verification error:', error);
+                showNotification(error.message || 'Failed to verify payment', 'error');
+            } finally {
+                resetButtons(buttons);
+            }
+        }
+        
+        // Reset buttons to original state
+        function resetButtons(buttons) {
+            buttons.forEach(btn => {
+                if (btn.classList.contains('approve-btn')) {
+                    btn.innerHTML = `<i class="fas fa-check"></i> Approve`;
+                } else if (btn.classList.contains('reject-btn')) {
+                    btn.innerHTML = `<i class="fas fa-times"></i> Reject`;
+                } else if (btn.classList.contains('reset-btn')) {
+                    btn.innerHTML = `<i class="fas fa-undo"></i> Reset`;
+                }
+                btn.disabled = false;
+            });
+        }
+
+        // Search payments
+        function searchPayments() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (!query) {
+                renderPayments(allPayments);
+                return;
+            }
+            
+            const filtered = allPayments.filter(payment => {
+                return (
+                    payment.transaction_id.toLowerCase().includes(query) ||
+                    (payment.user_email && payment.user_email.toLowerCase().includes(query)) ||
+                    (payment.user_name && payment.user_name.toLowerCase().includes(query)) ||
+                    payment.amount.toString().includes(query) ||
+                    payment.status.toLowerCase().includes(query)
+                );
+            });
+            
+            renderPayments(filtered);
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification show ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('adminToken');
+            if (socket) socket.disconnect();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

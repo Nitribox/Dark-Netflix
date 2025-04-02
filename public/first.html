@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles.css">
+  <title>Netflix Clone</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      color: #fff;
+      background-image: url('All background/first\ page\ background.jpeg'); /* Replace with your image URL */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* Header Styles */
+    header {
+      display: flex;
+      justify-content: space-between; /* Distribute space between items */
+      align-items: center;
+      padding: 20px 20px; /* Reduced padding to save space */
+      background-color: rgb(0, 0, 0);
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .header-center {
+      flex-grow: 1; /* Allow this element to grow and take up available space */
+      text-align: center; /* Center the text */
+      margin-left: 20px; /* Add some spacing from the logo */
+    }
+
+    .login-section {
+      display: flex;
+      align-items: center; /* Align text and button vertically */
+      gap: 10px; /* Space between text and button */
+      margin-left: auto; /* Push the login section to the right */
+      margin-right: 10px; /* Add some spacing from the right edge */
+    }
+
+    .login-section p {
+      margin: 0; /* Remove default margin for the paragraph */
+      font-size: 16px; /* Adjust font size */
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    nav ul li {
+      font-size: 18px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    nav ul li a:hover {
+      color: #ffffff;
+    }
+
+    /* Login Button Styles */
+    .login-button {
+      background-color: #e50914; /* Netflix red color */
+      color: #fff; /* White text */
+      border: none;
+      padding: 8px 15px; /* Reduced padding to make the button smaller */
+      font-size: 16px; /* Adjust font size */
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease; /* Smooth hover effect */
+      z-index: 1001; /* Ensure it's above other elements */
+      width: 90px; /* Fixed width to control the button size */
+    }
+
+    .login-button:hover {
+      background-color: #218838; /* Slightly darker red on hover */
+    }
+
+    /* Sign Up Button Styles */
+    .sign-up {
+      background-color: #e50914; /* Netflix red color */
+      color: #fff; /* White text */
+      border: none;
+      padding: 10px 20px; /* Reduced padding to make the button shorter */
+      font-size: 18px; /* Increase font size */
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease; /* Smooth hover effect */
+      z-index: 1001; /* Ensure it's above other elements */
+      width: 150px; /* Fixed width to control the button size */
+    }
+
+    .sign-up:hover {
+      background-color: #218838; /* Slightly darker red on hover */
+    }
+
+    /* Hero Section Styles */
+    .hero {
+      height: 100vh;
+      background: url('All background/first\ page\ background.jpeg') no-repeat center center/cover; /* Replace with your image URL */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-content {
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sign-up-container {
+      display: flex;
+      align-items: center; /* Align text and button horizontally */
+      gap: 10px; /* Space between text and button */
+    }
+
+    .hero-content h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .hero-content p {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
+
+    .hero-content input {
+      padding: 15px;
+      width: 300px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    /* Benefits Section Styles */
+    .benefits {
+      padding: 50px;
+      background-color: #000000;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .benefits h2 {
+      font-size: 32px;
+      margin-bottom: 40px;
+    }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+
+    .benefit-item {
+      background-color: rgba(56, 52, 52, 0.8); /* Slightly transparent to see the background */
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .benefit-item h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .benefit-item p {
+      font-size: 18px;
+      color: #ccc;
+    }
+
+    /* Footer Styles */
+    footer {
+      background-color: #000000;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .social-media {
+      margin-bottom: 20px;
+    }
+
+    .social-media a {
+      margin: 0 10px;
+      display: inline-block;
+    }
+
+    .social-media img {
+      width: 40px;
+      height: 40px;
+      transition: transform 0.3s ease;
+    }
+
+    .social-media img:hover {
+      transform: scale(1.2);
+    }
+
+    .contact-section {
+      font-size: 18px;
+      color: #ccc;
+    }
+
+    .contact-section a {
+      color: #e50914;
+      text-decoration: none;
+    }
+
+    .contact-section a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <img src="All background/logo1.jpg" alt="logo" width="80"> 
+    </div>
+    <div class="header-center">
+      <h1>Welcome to NetDark</h1>
+    </div>
+    <div class="login-section">
+      <p>Already Registered?</p>
+      <a href="login.html">
+      <button class="login-button">Login</button>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Unlimited movies, TV shows, and more.</h1>
+      <p>Starts at ₹399/year.</p>
+      <p>Ready to watch</p>
+      <div class="sign-up-container">
+        <p>New to NetDark?</p>
+        <a href="index.html"> <!-- Relative path to signup.html -->
+          <button class="sign-up">Sign Up</button>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits">
+    <h2>Special features</h2>
+    <div class="benefits-grid">
+      <div class="benefit-item">
+        <h3>Enjoy on your TV</h3>
+        <p>Watch on smart TVs, PlayStation, Xbox, Chromecast, Apple TV, Blu-ray players, and more.</p>
+      </div>
+      <div class="benefit-item">
+        <h3>Download your shows to watch offline</h3>
+        <p>Save your favorite's easily and always have something to watch.</p>
+      </div>
+      <div class="benefit-item">
+        <h3>Watch everywhere</h3>
+        <p>Stream unlimited movies and TV shows on your phone, tablet, laptop, and TV.</p>
+      </div>
+      <div class="benefit-item">
+        <h3>50+ live HD channels</h3>
+        <p>Enjoy your favorite's shows in the HD clarity.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="social-media">
+      <p>NetDark: A Content Aggregation Mobile Application<br>
+        Key Features<br>
+        Content Aggregation:
+        
+        Integrates multiple streaming platforms (Netflix, Prime Video, JioHotstar, JioCinema).<br>
+        
+        Eliminates the need to switch between apps.<br>
+        
+        Live TV:
+        
+        Dedicated section for live sports, news, and entertainment.<br>
+        
+        Content Categories:
+        
+        Organized into sections like Telugu, NetDarkTV, Sports, and Viacom18.
+        
+        Simplifies content discovery.<br>
+        
+        Search Functionality:
+        
+        Unified search across all platforms for quick access to movies, shows, and channels.<br>
+        
+        "My List" Feature:
+        
+        Allows users to save content for later viewing.<br>
+        
+        User Interface:
+        
+        Dark theme for reduced eye strain.
+        
+        Grid layout for easy navigation.
+        
+        </p>
+
+      <a href="https://whatsapp.com/channel/0029VanRpkN2ZjCmZwYGeL2a" target="_blank"><img src="All background/whatsapp.png" alt="whatsapp"></a>
+      <a href="https://t.me/NetDark_official" target="_blank"><img src="All background/telegram.jpg" alt="Twitter"></a>
+      <a href="https://www.instagram.com/netdark.in/" target="_blank"><img src="All background/insta.png" alt="Instagram"></a>
+    </div>
+    <div class="contact-section">
+      <p>Contact us: <a href="mailto:netdark.official@gmail.com">support@netdark.com</a></p>
+      <p>Follow us on social media for updates!</p>
+    </div>
+  </footer>
+</body>
+</html>

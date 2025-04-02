@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-image: url('All background/first page background.jpeg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    header {
+      background-color: rgb(0, 0, 0);
+      color: #ffffff;
+      padding: 10px 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .logo-container img {
+      width: 80px;
+    }
+    .header-center h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #ffffff;
+    }
+    .login-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 16px;
+      color: #555;
+    }
+    .form-group input {
+      width: 94%;
+      padding: 10px 40px 10px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .submit-button {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .submit-button:hover {
+      background-color: #218838;
+    }
+    .error-message {
+      color: #ff0000;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .forgot-password {
+      color: #007bff;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+      margin: 10px 0;
+    }
+    .new-to-netdark {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sign-in-button {
+      background-color: #ff0000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .sign-in-button:hover {
+      background-color: #cc0000;
+    }
+    .password-container {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header>
+    <div class="logo-container">
+      <img src="All background/logo1.jpg" alt="NetDark Logo">
+    </div>
+    <div class="header-center">
+      <h1>Welcome to NetDark</h1>
+    </div>
+    <div style="width: 80px;"></div>
+  </header>
+
+  <!-- Login Container -->
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          <img src="All background/open-eye.png" alt="Show Password" class="toggle-password" id="eyeIcon">
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form-group">
+        <button type="submit" class="submit-button">Login</button>
+      </div>
+
+      <!-- Error Message -->
+      <div id="errorMessage" class="error-message"></div>
+
+      <!-- Forgot Password Section -->
+      <div class="forgot-password" onclick="window.location.href='forgot-password.html'">
+        Forgot Password?
+      </div>
+    </form>
+
+    <!-- New to NetDark Section -->
+    <div class="new-to-netdark">
+      <p>New to NetDark?</p>
+      <button class="sign-in-button" onclick="window.location.href='index.html'">Register</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Password visibility toggle
+      const eyeIcon = document.getElementById('eyeIcon');
+      const passwordInput = document.getElementById('password');
+
+      eyeIcon.addEventListener('click', function() {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeIcon.src = "All background/closed-eye.png";
+          eyeIcon.alt = "Hide Password";
+        } else {
+          passwordInput.type = 'password';
+          eyeIcon.src = "All background/open-eye.png";
+          eyeIcon.alt = "Show Password";
+        }
+      });
+
+      // Login form handling
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const errorElement = document.getElementById('errorMessage');
+        const submitButton = document.querySelector('.submit-button');
+        
+        // Clear previous errors
+        errorElement.textContent = '';
+        submitButton.disabled = true;
+        submitButton.textContent = 'Logging in...';
+
+        // Basic validation
+        if (!email || !password) {
+          errorElement.textContent = 'Please fill in all fields.';
+          submitButton.disabled = false;
+          submitButton.textContent = 'Login';
+          return;
+        }
+
+        try {
+          const response = await fetch('http://localhost:3000/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+          });
+
+          // Handle non-JSON responses
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(text || 'Invalid server response');
+          }
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Login failed');
+          }
+
+          // Store the token in localStorage
+          if (data.token) {
+            localStorage.setItem('token', data.token);
+          }
+
+          // Login successful - redirect
+          window.location.href = 'subscription page.html';
+          
+        } catch (error) {
+          console.error('Login error:', error);
+          errorElement.textContent = error.message.includes('Failed to fetch') 
+            ? 'Cannot connect to server. Please try again later.'
+            : error.message;
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Login';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

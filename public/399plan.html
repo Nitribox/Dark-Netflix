@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Payment Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .qr-section {
+            margin-bottom: 2rem;
+        }
+
+        .qr-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            margin: 1rem auto;
+            border: 2px solid #e0e0e0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .upi-details {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .instructions {
+            color: #7f8c8d;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .form-group {
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input, 
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .file-upload {
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-upload label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-upload label:hover {
+            background: #2980b9;
+        }
+
+        #fileName {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .success {
+            color: #2ecc71;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+            padding: 10px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="qr-section">
+            <h2>Scan QR Code to Pay ₹399</h2>
+            <img src="All background/399.jpeg" alt="Payment QR Code" class="qr-image">
+            <div class="upi-details">
+                <p>UPI ID: 7304167295@fam</p>
+                <p>Account Name: somesh pandey pandey</p>
+                <p>Amount: ₹399 (Fixed)</p>
+            </div>
+            <div class="instructions">
+                <p><strong>Instructions:</strong></p>
+                <ol>
+                    <li>Scan the QR code using any UPI payment app</li>
+                    <li>Complete the payment of ₹399</li>
+                    <li>Take a screenshot of the payment confirmation</li>
+                    <li>Fill the form below with transaction details</li>
+                </ol>
+            </div>
+        </div>
+
+        <form id="paymentForm" enctype="multipart/form-data">
+            <input type="hidden" id="userId" value="">
+            
+            <div class="form-group">
+                <label for="transactionId">UPI Transaction ID</label>
+                <input type="text" id="transactionId" 
+                       placeholder="Ex: MP1234567890" required>
+                <div class="error" id="transactionError"></div>
+                <small>Find this in your payment app's receipt</small>
+            </div>
+
+            <div class="form-group">
+                <label for="paymentProof">Payment Screenshot</label>
+                <div class="file-upload">
+                    <label for="paymentProof">Choose JPG File</label>
+                    <input type="file" id="paymentProof" accept=".jpg,.jpeg" required style="display: none;">
+                    <span id="fileName">No file chosen</span>
+                </div>
+                <div class="error" id="fileError"></div>
+                <small>Upload screenshot of payment confirmation (JPG only, max 5MB)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="userNote">Additional Notes (Optional)</label>
+                <textarea id="userNote" rows="3" placeholder="Any special instructions or details..."></textarea>
+            </div>
+
+            <button type="submit" id="submitBtn">Submit Payment Proof</button>
+            <div class="success" id="successMessage"></div>
+        </form>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('paymentForm');
+        const transactionInput = document.getElementById('transactionId');
+        const paymentProofInput = document.getElementById('paymentProof');
+        const fileNameSpan = document.getElementById('fileName');
+        const transactionError = document.getElementById('transactionError');
+        const fileError = document.getElementById('fileError');
+        const successMessage = document.getElementById('successMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Get user ID from JWT token
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    document.getElementById('userId').value = payload.id;
+                } catch (e) {
+                    console.error('Error parsing token:', e);
+                    showError(transactionError, 'Please login again');
+                }
+            } else {
+                showError(transactionError, 'Please login to submit payment');
+                submitBtn.disabled = true;
+            }
+        });
+
+        // Show selected filename
+        paymentProofInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileNameSpan.textContent = file.name;
+                
+                // Validate file type
+                if (!file.type.match('image/jpeg') && !file.name.toLowerCase().match(/\.(jpg|jpeg)$/)) {
+                    showError(fileError, 'Only JPG/JPEG files are allowed');
+                    e.target.value = ''; // Clear the file input
+                    fileNameSpan.textContent = 'No file chosen';
+                } else {
+                    fileError.style.display = 'none';
+                }
+            } else {
+                fileNameSpan.textContent = 'No file chosen';
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset messages
+            hideAllMessages();
+
+            // Validate inputs
+            if (!validateForm()) {
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('transaction_id', transactionInput.value.trim());
+            formData.append('amount', '399');
+            formData.append('user_id', document.getElementById('userId').value);
+            formData.append('screenshot', paymentProofInput.files[0]);
+            formData.append('notes', document.getElementById('userNote').value);
+
+            // Disable button during submission
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/payments', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Payment submission failed');
+                }
+
+                const result = await response.json();
+                showSuccess('Payment submitted successfully! Your account will be activated after verification.');
+                form.reset();
+                fileNameSpan.textContent = 'No file chosen';
+            } catch (error) {
+                console.error('Error:', error);
+                showError(transactionError, error.message || 'Failed to submit payment. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Payment Proof';
+            }
+        });
+
+        function validateForm() {
+            let isValid = true;
+            
+            // Validate transaction ID
+            const transactionId = transactionInput.value.trim();
+            if (!transactionId || transactionId.length < 8) {
+                showError(transactionError, 'Invalid transaction ID (minimum 8 characters)');
+                isValid = false;
+            }
+
+            // Validate file
+            if (!paymentProofInput.files || paymentProofInput.files.length === 0) {
+                showError(fileError, 'Payment proof is required');
+                isValid = false;
+            } else {
+                const file = paymentProofInput.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    showError(fileError, 'File size must be less than 5MB');
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        function hideAllMessages() {
+            transactionError.style.display = 'none';
+            fileError.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

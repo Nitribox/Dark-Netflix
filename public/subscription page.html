@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetDark Subscription Plans</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    /* Container Styles */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header Styles */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background-color: #111;
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-container img {
+      width: 80px;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    .header-center {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .header-center h1 {
+      font-size: 32px;
+      margin: 0;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+    }
+
+    .header-center h2 {
+      font-size: 24px;
+      margin: 10px 0 0;
+      color: #fff;
+      font-weight: 300;
+    }
+
+    /* Subscription Plans Section */
+    .plans {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 140px;
+      flex-wrap: wrap;
+    }
+
+    .plan {
+      background-color: #222;
+      padding: 30px;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 300px;
+      max-width: 450px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #333;
+    }
+
+    .plan:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+    }
+
+    .plan h3 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #e50914;
+    }
+
+    .plan p {
+      font-size: 16px;
+      color: #ccc;
+      min-height: 80px;
+    }
+
+    .plan hr {
+      border: 1px solid #444;
+      margin: 20px 0;
+    }
+
+    .ott-logos {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .ott-logos img {
+      width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      object-fit: contain;
+      background-color: #fff;
+      padding: 3px;
+    }
+
+    .plan button {
+      background-color: #e50914;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    .plan button:hover {
+      background-color: #f40612;
+      transform: scale(1.03);
+    }
+
+    /* Download button styles */
+    .download-btn {
+      background-color: #4CAF50;
+      display: none;
+      width: 100%;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background-color: #45a049;
+      transform: scale(1.03);
+    }
+
+    /* Status message */
+    .status-message {
+      margin-top: 15px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    .approved {
+      color: #4CAF50;
+    }
+
+    .pending {
+      color: #FFC107;
+    }
+
+    /* Pricing Details Section */
+    .pricing-details {
+      margin-top: 40px;
+      text-align: center;
+      padding: 20px;
+      background-color: #111;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
+
+    .pricing-details h3 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #e50914;
+    }
+
+    .pricing-details p {
+      font-size: 16px;
+      color: #ccc;
+      margin: 10px 0;
+    }
+
+    .pricing-details .price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    /* Footer Styles */
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #111;
+      margin-top: 40px;
+      border-top: 1px solid #333;
+    }
+
+    footer p {
+      margin: 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 15px;
+      }
+      
+      .logo-container {
+        margin-bottom: 10px;
+      }
+      
+      .header-center h1 {
+        font-size: 24px;
+      }
+      
+      .header-center h2 {
+        font-size: 18px;
+      }
+      
+      .plans {
+        flex-direction: column;
+        margin-top: 120px;
+      }
+      
+      .plan {
+        min-width: 100%;
+      }
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <img src="All background/logo1.jpg" alt="NetDark Logo">
+    </div>
+    <div class="header-center">
+      <h1>Welcome to NetDark</h1>
+      <h2>Choose Your Subscription Plan</h2>
+    </div>
+  </header>
+
+  <!-- Subscription Plans -->
+  <div class="container">
+    <div class="plans">
+      <!-- Subscription Plan 1 -->
+      <div class="plan">
+        <h3>Basic Plan</h3>
+        <p>Access to Netflix and Amazon Prime with standard definition quality. Perfect for single device streaming.</p>
+        <div class="ott-logos">
+          <img src="All background/NetFlix logo.jpg" alt="Netflix">
+          <img src="All background/amazon prime logo.jpg" alt="Amazon Prime">
+        </div>
+        <button id="plan1-subscribe" onclick="processPayment('399')">
+          <span id="plan1-btn-text">₹399/year</span>
+          <div id="plan1-spinner" class="spinner"></div>
+        </button>
+        <button id="plan1-download" class="download-btn" onclick="downloadCredentials('399')">
+          Download Credentials
+        </button>
+        <p id="plan1-status" class="status-message"></p>
+      </div>
+
+      <!-- Subscription Plan 2 -->
+      <div class="plan">
+        <h3>Premium Plan</h3>
+        <p>Full access to all OTT platforms in HD quality, multiple devices, and live TV channels included.</p>
+        <div class="ott-logos">
+          <img src="All background/NetFlix logo.jpg" alt="Netflix">
+          <img src="All background/amazon prime logo.jpg" alt="Amazon Prime">
+          <img src="All background/jio hotstar logo.jpg" alt="Jio Hotstar">
+          <img src="All background/Crunchyroll.jpg" alt="Crunchyroll">
+          <img src="All background/SonyLIV logo.jpg" alt="SonyLIV">
+          <img src="All background/Zee5.png" alt="Zee5">
+        </div>
+        <button id="plan2-subscribe" onclick="processPayment('499')">
+          <span id="plan2-btn-text">₹499/year</span>
+          <div id="plan2-spinner" class="spinner"></div>
+        </button>
+        <button id="plan2-download" class="download-btn" onclick="downloadCredentials('499')">
+          Download Credentials
+        </button>
+        <p id="plan2-status" class="status-message"></p>
+      </div>
+    </div>
+
+    <!-- Pricing Details -->
+    <div class="pricing-details">
+      <h3>Pricing Details</h3>
+      <p><span class="price">Basic Plan:</span> ₹399/year (Single Device)</p>
+      <p><span class="price">Premium Plan:</span> ₹499/year (Multiple Devices)</p>
+      <p>All plans include 24/7 customer support and are available in multiple languages.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 NetDark. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Check user's approval status when page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await checkApprovalStatus();
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+          // If not logged in, redirect to login page
+          window.location.href = '/login.html';
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      }
+    });
+
+    // Check approval status from server
+    async function checkApprovalStatus() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const response = await fetch('/api/user/check-approval', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401) {
+          // Unauthorized - token expired or invalid
+          localStorage.removeItem('token');
+          window.location.href = '/login.html';
+          return;
+        }
+
+        const data = await response.json();
+        
+        if (data.approved && data.paymentStatus) {
+          // User is approved and payment is complete
+          if (data.plan === '399') {
+            document.getElementById('plan1-subscribe').style.display = 'none';
+            document.getElementById('plan1-download').style.display = 'block';
+            document.getElementById('plan1-status').textContent = 'Subscription Active!';
+            document.getElementById('plan1-status').className = 'status-message approved';
+          } else if (data.plan === '499') {
+            document.getElementById('plan2-subscribe').style.display = 'none';
+            document.getElementById('plan2-download').style.display = 'block';
+            document.getElementById('plan2-status').textContent = 'Subscription Active!';
+            document.getElementById('plan2-status').className = 'status-message approved';
+          }
+        } else if (data.approved && !data.paymentStatus) {
+          // Approved but payment pending
+          const statusElement = document.getElementById(`${data.plan === '399' ? 'plan1' : 'plan2'}-status`);
+          statusElement.textContent = 'Approved - Complete payment to activate';
+          statusElement.className = 'status-message pending';
+        }
+      } catch (error) {
+        console.error('Error checking approval:', error);
+      }
+    }
+
+    // Process payment for selected plan
+    async function processPayment(plan) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const buttonId = `plan${plan === '399' ? '1' : '2'}-subscribe`;
+      const spinnerId = `plan${plan === '399' ? '1' : '2'}-spinner`;
+      const btnTextId = `plan${plan === '399' ? '1' : '2'}-btn-text`;
+      
+      try {
+        // Show loading spinner
+        document.getElementById(spinnerId).style.display = 'block';
+        document.getElementById(btnTextId).style.display = 'none';
+        document.getElementById(buttonId).disabled = true;
+
+        const response = await fetch('/api/payments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ 
+            plan,
+            notes: `Subscription payment for ${plan === '399' ? 'Basic' : 'Premium'} Plan`
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Payment failed');
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Payment submitted successfully! Your subscription will be activated after admin verification.');
+          await checkApprovalStatus();
+        } else {
+          alert('Payment processing failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        alert(error.message || 'An error occurred during payment processing');
+      } finally {
+        // Hide loading spinner
+        document.getElementById(spinnerId).style.display = 'none';
+        document.getElementById(btnTextId).style.display = 'inline';
+        document.getElementById(buttonId).disabled = false;
+      }
+    }
+
+    // Download credentials for approved plan
+    async function downloadCredentials(plan) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      try {
+        // In a real app, this would fetch actual credentials from the server
+        // For demo, we'll create a simple text file
+        const credentials = {
+          username: `netdark_user_${Math.random().toString(36).substring(2, 8)}`,
+          password: Math.random().toString(36).substring(2, 12),
+          plan: plan === '399' ? 'Basic' : 'Premium',
+          expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString()
+        };
+
+        // Create a blob with the credentials
+        const content = `NetDark Subscription Credentials\n\n` +
+                       `Plan: ${credentials.plan}\n` +
+                       `Username: ${credentials.username}\n` +
+                       `Password: ${credentials.password}\n` +
+                       `Expiry Date: ${credentials.expiry}\n\n` +
+                       `Thank you for choosing NetDark!`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create a temporary anchor element to trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `netdark_credentials_${plan === '399' ? 'basic' : 'premium'}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // In a real app, you might want to log this download
+        // await fetch('/api/log-download', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Failed to download credentials. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>

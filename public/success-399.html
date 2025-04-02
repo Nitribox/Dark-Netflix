@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - NetDark Basic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --netdark-blue: #3498db;
+            --netdark-black: #000000;
+            --netdark-dark: #141414;
+            --silver-accent: #bdc3c7;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--netdark-black);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(52, 152, 219, 0.6);
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-1000px) rotate(720deg); }
+        }
+        
+        .success-container {
+            background: rgba(20, 20, 20, 0.95);
+            width: 90%;
+            max-width: 700px;
+            margin: 5vh auto;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(52, 152, 219, 0.3),
+                        0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            backdrop-filter: blur(10px);
+            transform: scale(0.95);
+            opacity: 0;
+            animation: scaleIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes scaleIn {
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .success-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 30px rgba(46, 204, 113, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 30px rgba(46, 204, 113, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(46, 204, 113, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 30px rgba(46, 204, 113, 0.5); }
+        }
+        
+        .success-icon i {
+            font-size: 50px;
+            color: white;
+        }
+        
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--netdark-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        
+        .basic-badge {
+            background: #3498db;
+            color: rgb(196, 243, 9);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            
+            margin-left: 15px;
+            animation: pulse-blue 2s infinite;
+        }
+            .subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-bottom: 2rem;
+        }
+        
+        .plan-info {
+            background: rgba(30, 30, 30, 0.7);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--netdark-blue);
+        }
+        
+        .plan-info h2 {
+            color: var(--silver-accent);
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .plan-info p {
+            color: #ccc;
+        }
+        
+        .apk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .apk-card {
+            background: linear-gradient(145deg, #1a1a1a, #111);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+                        inset 0 0 10px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .apk-card:nth-child(1) { animation-delay: 0.3s; }
+        .apk-card:nth-child(2) { animation-delay: 0.5s; }
+        .apk-card:nth-child(3) { animation-delay: 0.7s; }
+        
+        @keyframes slideUp {
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .apk-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--netdark-blue), var(--silver-accent));
+        }
+        
+        .apk-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .apk-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .apk-icon i {
+            font-size: 24px;
+            color: var(--netdark-blue);
+        }
+        
+        .apk-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+            color: white;
+        }
+        
+        .apk-details p {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, var(--netdark-blue), #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
+        }
+        
+        .download-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .download-btn i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .download-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 55%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .instructions {
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.8s 0.9s forwards;
+        }
+        
+        .instructions h3 {
+            color: var(--silver-accent);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .instructions h3 i {
+            margin-right: 10px;
+        }
+        
+        .instructions ol {
+            padding-left: 1.5rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.8rem;
+            color: #ccc;
+            position: relative;
+        }
+        
+        .instructions li::marker {
+            color: var(--netdark-blue);
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .success-container {
+                padding: 2rem 1.5rem;
+                width: 95%;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .apk-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-particles" id="particles"></div>
+    
+    <div class="success-container">
+        <div class="success-header">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1>PAYMENT SUCCESSFUL! <span class="basic-badge">BASIC PLAN</span></h1>
+            <p class="subtitle">Thank you for your ₹399 payment</p>
+        </div>
+        
+        <div class="plan-info">
+            <h2>Basic Plan Activated</h2>
+            <p>Choose from these compatible app versions:</p>
+        </div>
+        
+        <div class="apk-grid">
+            <!-- APK 1 -->
+            <div class="apk-card">
+                <div class="apk-info">
+                    <div class="apk-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="apk-details">
+                        <h3>Standard Version</h3>
+                        <p>v2.1.0 | 38 MB | Android 7.0+</p>
+                    </div>
+                </div>
+                <a href="/downloads/basic/netdark-basic-v2.1.0.apk" class="download-btn" download>
+                    <i class="fas fa-download"></i> DOWNLOAD
+                </a>
+            </div>
+            
+            <!-- APK 2 -->
+            <div class="apk-card">
+                <div class="apk-info">
+                    <div class="apk-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="apk-details">
+                        <h3>Lite Version</h3>
+                        <p>v1.5.3 | 28 MB | Android 5.0+</p>
+                    </div>
+                </div>
+                <a href="/downloads/basic/netdark-lite-v1.5.3.apk" class="download-btn" download>
+                    <i class="fas fa-download"></i> DOWNLOAD
+                </a>
+            </div>
+            
+            <!-- APK 3 -->
+            <div class="apk-card">
+                <div class="apk-info">
+                    <div class="apk-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="apk-details">
+                        <h3>Legacy Version</h3>
+                        <p>v1.0.9 | 22 MB | Android 4.4+</p>
+                    </div>
+                </div>
+                <a href="/downloads/basic/netdark-legacy-v1.0.9.apk" class="download-btn" download>
+                    <i class="fas fa-download"></i> DOWNLOAD
+                </a>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> Installation Guide</h3>
+            <ol>
+                <li>Download your preferred APK version</li>
+                <li>Enable "Install Unknown Sources" in Settings → Security</li>
+                <li>Open the downloaded file and tap "Install"</li>
+                <li>Launch the app and enjoy your Basic Plan features</li>
+                <li>For optimal experience, use Standard Version</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 20 : 40;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 8 + 3;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100 + 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 15;
+                const opacity = Math.random() * 0.4 + 0.1;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.opacity = opacity;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        document.querySelectorAll('.download-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> DOWNLOADING...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> DOWNLOAD COMPLETE';
+                }, 2000);
+            });
+        });
+        
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            // Load payment details if needed
+            if (typeof loadPaymentDetails === 'function') {
+                loadPaymentDetails();
+            }
+        });
+    </script>
+</body>
+</html>
